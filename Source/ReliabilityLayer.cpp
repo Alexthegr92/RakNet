@@ -332,6 +332,105 @@ ReliabilityLayer::ReliabilityLayer()
 	refCountedDataPool.SetPageSize(sizeof(InternalPacketRefCountedData)*32);
 }
 
+RakNet::ReliabilityLayer::ReliabilityLayer(const ReliabilityLayer& r)
+{
+	timeoutTime = r.timeoutTime;
+
+#ifdef _DEBUG
+	minExtraPing = r.minExtraPing;
+	extraPingVariance = r.extraPingVariance;
+	packetloss = (double)minExtraPing;
+#endif
+
+
+#ifdef PRINT_TO_FILE_RELIABLE_ORDERED_TEST
+	if (fp == 0 && 0)
+	{
+		fp = fopen("reliableorderedoutput.txt", "wt");
+	}
+#endif
+
+	memset(orderedWriteIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType));
+	memset(sequencedWriteIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType));
+	memset(orderedReadIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType));
+	memset(highestSequencedReadIndex, 0, NUMBER_OF_ORDERED_STREAMS * sizeof(OrderingIndexType));
+	memset(&statistics, 0, sizeof(statistics));
+	memset(&heapIndexOffsets, 0, sizeof(heapIndexOffsets));
+
+	statistics.connectionStartTime	= r.statistics.connectionStartTime;
+	splitPacketId					= r.splitPacketId;
+	elapsedTimeSinceLastUpdate		= r.elapsedTimeSinceLastUpdate;
+	throughputCapCountdown			= r.throughputCapCountdown;
+	sendReliableMessageNumberIndex	= r.sendReliableMessageNumberIndex;
+	internalOrderIndex				= r.internalOrderIndex;
+	timeToNextUnreliableCull		= r.timeToNextUnreliableCull;
+	unreliableLinkedListHead		= r.unreliableLinkedListHead;
+	lastUpdateTime					= r.lastUpdateTime;
+	bandwidthExceededStatistic		= r.bandwidthExceededStatistic;
+	remoteSystemTime				= r.remoteSystemTime;
+	unreliableTimeout				= r.unreliableTimeout;
+	lastBpsClear					= r.lastBpsClear;
+
+	// Disable packet pairs
+	countdownToNextPacketPair		= r.countdownToNextPacketPair;
+
+	nextAllowedThroughputSample		= r.nextAllowedThroughputSample;
+	deadConnection					= r.deadConnection;
+	cheater							= r.cheater;
+	timeOfLastContinualSend			= r.timeOfLastContinualSend;
+
+	// timeResendQueueNonEmpty = 0;
+	timeLastDatagramArrived			= r.timeLastDatagramArrived;
+	//	packetlossThisSample=false;
+	//	backoffThisSample=0;
+	//	packetlossThisSampleResendCount=0;
+	//	lastPacketlossTime=0;
+	statistics.messagesInResendBuffer = r.statistics.messagesInResendBuffer;
+	statistics.bytesInResendBuffer	= r.statistics.bytesInResendBuffer;
+
+	receivedPacketsBaseIndex		= r.receivedPacketsBaseIndex;
+	resetReceivedPackets			= r.resetReceivedPackets;
+	receivePacketCount				= r.receivePacketCount;
+
+	//	SetPing( 1000 );
+
+	timeBetweenPackets = r.timeBetweenPackets;
+
+	ackPingIndex = r.ackPingIndex;
+	ackPingSum = r.ackPingSum;
+
+	nextSendTime = r.nextSendTime;
+	//nextLowestPingReset=(CCTimeType)0;
+	//	continuousSend=false;
+
+	//	histogramStart=(CCTimeType)0;
+	//	histogramBitsSent=0;
+	unacknowledgedBytes = r.unacknowledgedBytes;
+	resendLinkedListHead = r.resendLinkedListHead;
+	totalUserDataBytesAcked = r.totalUserDataBytesAcked;
+
+	datagramHistoryPopCount = r.datagramHistoryPopCount;
+
+	InitHeapWeights();
+	for (int i = 0; i < NUMBER_OF_PRIORITIES; i++)
+	{
+		statistics.messageInSendBuffer[i] =r.statistics.messageInSendBuffer[i];
+		statistics.bytesInSendBuffer[i] = r.statistics.bytesInSendBuffer[i];
+	}
+
+	for (int i = 0; i < RNS_PER_SECOND_METRICS_COUNT; i++)
+	{
+		bpsMetrics[i] = r.bpsMetrics[i];// .Reset(_FILE_AND_LINE_);
+	}
+
+	//int i = sizeof(InternalPacket);
+	datagramHistoryMessagePool.SetPageSize(sizeof(MessageNumberNode) * 128);
+	internalPacketPool.SetPageSize(sizeof(InternalPacket)*INTERNAL_PACKET_PAGE_SIZE);
+	refCountedDataPool.SetPageSize(sizeof(InternalPacketRefCountedData) * 32);
+
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 // Destructor
 //-------------------------------------------------------------------------------------------------------
