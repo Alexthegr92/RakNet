@@ -997,7 +997,8 @@ void CDemo::UpdateRakNet(void)
 			{
 				DataStructures::List<RakNet::SystemAddress> addresses;
 				DataStructures::List<RakNet::RakNetGUID> guids;
-				fullyConnectedMesh2->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids);
+				DataStructures::List<RakNet::BitStream*> userData;
+				fullyConnectedMesh2->GetVerifiedJoinRequiredProcessingList(packet->guid, addresses, guids, userData);
 				for (unsigned int i=0; i < guids.Size(); i++)
 					natPunchthroughClient->OpenNAT(guids[i], facilitatorSystemAddress);
 			}

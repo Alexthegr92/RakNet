@@ -1,6 +1,7 @@
 # Visual Studio
 [Dd]ebug/
 [Rr]elease/
+[Ll]ib/
 x64/
 
 *.opensdf
@@ -11,6 +12,7 @@ x64/
 *.VC.db
 *.exp
 *.idb
+*.dll
 
 # Xcode and OS X 
 build/
