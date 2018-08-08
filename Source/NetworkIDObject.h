@@ -41,6 +41,8 @@ public:
 
 	// Destructor.  Used NetworkIDs, if any, are freed here.
 	virtual ~NetworkIDObject();
+	
+	void StopTrackingThis();
 
 	/// Sets the manager class from which to request unique network IDs
 	/// Unlike previous versions, the NetworkIDObject relies on a manager class to provide IDs, rather than using statics,

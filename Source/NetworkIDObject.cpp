@@ -31,6 +31,11 @@ NetworkIDObject::~NetworkIDObject()
 	if (networkIDManager)
 		networkIDManager->StopTrackingNetworkIDObject(this);
 }
+void NetworkIDObject::StopTrackingThis()
+{
+	if (networkIDManager)
+		networkIDManager->StopTrackingNetworkIDObject(this);
+}
 void NetworkIDObject::SetNetworkIDManager( NetworkIDManager *manager)
 {
 	if (manager==networkIDManager)
