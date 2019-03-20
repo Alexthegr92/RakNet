@@ -9,6 +9,7 @@
  */
 
 #include "NativeFeatureIncludes.h"
+#include <string>
 #if _RAKNET_SUPPORT_NatPunchthroughClient==1
 
 #include "NatPunchthroughClient.h"
@@ -792,37 +793,29 @@ void NatPunchthroughClient::SendTTL(const SystemAddress &sa)
 	rakPeerInterface->SendTTL(ipAddressString,sa.GetPort(), 2);
 }
 
-char *TestModeToString(NatPunchthroughClient::SendPing::TestMode tm)
+const char* TestModeToString(NatPunchthroughClient::SendPing::TestMode tm)
 {
 	switch (tm)
 	{
 		case NatPunchthroughClient::SendPing::TESTING_INTERNAL_IPS:
-			return "TESTING_INTERNAL_IPS";
-		break;
+			return std::string("TESTING_INTERNAL_IPS").c_str();
 		case NatPunchthroughClient::SendPing::WAITING_FOR_INTERNAL_IPS_RESPONSE:
-			return "WAITING_FOR_INTERNAL_IPS_RESPONSE";
-		break;
+			return std::string("WAITING_FOR_INTERNAL_IPS_RESPONSE").c_str();
 // 		case NatPunchthroughClient::SendPing::SEND_WITH_TTL:
 // 			return "SEND_WITH_TTL";
 // 		break;
 		case NatPunchthroughClient::SendPing::TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_FACILITATOR_PORT:
-			return "TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_FACILITATOR_PORT";
-		break;
+			return std::string("TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_FACILITATOR_PORT").c_str();
 		case NatPunchthroughClient::SendPing::TESTING_EXTERNAL_IPS_1024_TO_FACILITATOR_PORT:
-			return "TESTING_EXTERNAL_IPS_1024_TO_FACILITATOR_PORT";
-		break;
+			return std::string("TESTING_EXTERNAL_IPS_1024_TO_FACILITATOR_PORT").c_str();
 		case NatPunchthroughClient::SendPing::TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_1024:
-			return "TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_1024";
-		break;
+			return std::string("TESTING_EXTERNAL_IPS_FACILITATOR_PORT_TO_1024").c_str();
 		case NatPunchthroughClient::SendPing::TESTING_EXTERNAL_IPS_1024_TO_1024:
-			return "TESTING_EXTERNAL_IPS_1024_TO_1024";
-		break;
+			return std::string("TESTING_EXTERNAL_IPS_1024_TO_1024").c_str();
 		case NatPunchthroughClient::SendPing::WAITING_AFTER_ALL_ATTEMPTS:
-			return "WAITING_AFTER_ALL_ATTEMPTS";
-		break;
+			return std::string("WAITING_AFTER_ALL_ATTEMPTS").c_str();
 		case NatPunchthroughClient::SendPing::PUNCHING_FIXED_PORT:
-			return "PUNCHING_FIXED_PORT";
-		break;
+			return std::string("PUNCHING_FIXED_PORT").c_str();
 	}
 	return "";
 }
