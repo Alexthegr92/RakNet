@@ -26,6 +26,7 @@ namespace RakNet {
 /// Forward declarations
 class RakPeerInterface;
 class TCPInterface;
+class RDMAInterface;
 struct Packet;
 struct InternalPacket;
 
@@ -187,6 +188,10 @@ public:
 	/// \internal
 	void SetTCPInterface( TCPInterface *ptr );
 #endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	/// \internal
+	void SetRDMAInterface( RDMAInterface *ptr );
+#endif
 
 protected:
 	// Send through either rakPeerInterface or tcpInterface, whichever is available
@@ -202,6 +207,9 @@ protected:
 	RakPeerInterface *rakPeerInterface;
 #if _RAKNET_SUPPORT_TCPInterface==1
 	TCPInterface *tcpInterface;
+#endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	RDMAInterface *rdmaInterface;
 #endif
 };
 

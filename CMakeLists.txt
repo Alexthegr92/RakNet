@@ -60,6 +60,10 @@ if( RAKNET_GENERATE_SAMPLES )
 	add_subdirectory(Samples)
 endif()
 
+if( RAKNET_ENABLE_RDMA )
+	add_subdirectory(Samples/RDMAEchoServer)
+endif()
+
 if( RAKNET_GENERATE_ORIONSERVER )
 	add_subdirectory(OrionServer)
 endif()

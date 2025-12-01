@@ -173,6 +173,12 @@
 #ifndef _RAKNET_SUPPORT_RelayPlugin
 #define _RAKNET_SUPPORT_RelayPlugin 1
 #endif
+#ifndef _RAKNET_SUPPORT_RDMAInterface
+#define _RAKNET_SUPPORT_RDMAInterface 0
+#endif
+#ifndef _RAKNET_SUPPORT_PacketizedRDMA
+#define _RAKNET_SUPPORT_PacketizedRDMA 0
+#endif
 
 // Take care of dependencies
 #if _RAKNET_SUPPORT_DirectoryDeltaTransfer==1
@@ -190,6 +196,10 @@
 #if _RAKNET_SUPPORT_PacketizedTCP==1 || _RAKNET_SUPPORT_EmailSender==1 || _RAKNET_SUPPORT_HTTPConnection==1
 #undef _RAKNET_SUPPORT_TCPInterface
 #define _RAKNET_SUPPORT_TCPInterface 1
+#endif
+#if _RAKNET_SUPPORT_PacketizedRDMA==1
+#undef _RAKNET_SUPPORT_RDMAInterface
+#define _RAKNET_SUPPORT_RDMAInterface 1
 #endif
 
 

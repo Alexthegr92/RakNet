@@ -35,3 +35,12 @@ Debug/
 Release/
 .DS_Store
 .Trashes
+/.vs
+*.vcxproj
+*.filters
+/CMakeFiles
+*.sln
+/.vscode
+CMakeCache.txt
+*.stamp
+*.depend

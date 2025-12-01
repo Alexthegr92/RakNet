@@ -14,6 +14,10 @@
 #include "RakPeerInterface.h"
 #include "BitStream.h"
 
+#if _RAKNET_SUPPORT_RDMAInterface==1
+#include "PacketizedRDMA.h"
+#endif
+
 using namespace RakNet;
 
 PluginInterface2::PluginInterface2()
@@ -21,6 +25,9 @@ PluginInterface2::PluginInterface2()
 	rakPeerInterface=0;
 #if _RAKNET_SUPPORT_PacketizedTCP==1 && _RAKNET_SUPPORT_TCPInterface==1
 	tcpInterface=0;
+#endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	rdmaInterface=0;
 #endif
 }
 PluginInterface2::~PluginInterface2()
@@ -38,6 +45,13 @@ void PluginInterface2::SendUnified( const RakNet::BitStream * bitStream, PacketP
 	else if (tcpInterface)
 	{
 		tcpInterface->Send((const char*) bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), systemIdentifier.systemAddress, broadcast);
+		return;
+	}
+#endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		rdmaInterface->Send((const char*) bitStream->GetData(), bitStream->GetNumberOfBytesUsed(), systemIdentifier.systemAddress, broadcast);
 		return;
 	}
 #endif
@@ -75,6 +89,13 @@ void PluginInterface2::SendUnified( const char * data, const int length, PacketP
 		return;
 	}
 #endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		rdmaInterface->Send(data, length, systemIdentifier.systemAddress, broadcast);
+		return;
+	}
+#endif
 
 	// Offline mode
 	if (broadcast==false && systemIdentifier.rakNetGuid==GetMyGUIDUnified())
@@ -107,6 +128,12 @@ Packet *PluginInterface2::AllocatePacketUnified(unsigned dataSize)
 		return tcpInterface->AllocatePacket(dataSize);
 	}
 #endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		return rdmaInterface->AllocatePacket(dataSize);
+	}
+#endif
 
 	Packet *packet = RakNet::OP_NEW<Packet>(_FILE_AND_LINE_);
 	packet->data = (unsigned char*) rakMalloc_Ex(dataSize, _FILE_AND_LINE_);
@@ -131,6 +158,13 @@ void PluginInterface2::PushBackPacketUnified(Packet *packet, bool pushAtHead)
 		return;
 	}
 #endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		rdmaInterface->PushBackPacket(packet,pushAtHead);
+		return;
+	}
+#endif
 
 	OnReceive(packet);
 	Update();
@@ -149,6 +183,13 @@ void PluginInterface2::DeallocPacketUnified(Packet *packet)
 		return;
 	}
 #endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		rdmaInterface->DeallocatePacket(packet);
+		return;
+	}
+#endif
 
 	rakFree_Ex(packet->data, _FILE_AND_LINE_);
 	RakNet::OP_DELETE(packet, _FILE_AND_LINE_);
@@ -163,6 +204,12 @@ bool PluginInterface2::SendListUnified( const char **data, const int *lengths, c
 	else if (tcpInterface)
 	{
 		return tcpInterface->SendList(data,(const unsigned int *) lengths,numParameters,systemIdentifier.systemAddress,broadcast );
+	}
+#endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+	else if (rdmaInterface)
+	{
+		return rdmaInterface->SendList(data,(const unsigned int *) lengths,numParameters,systemIdentifier.systemAddress,broadcast );
 	}
 #endif
 
@@ -211,6 +258,12 @@ void PluginInterface2::SetRakPeerInterface( RakPeerInterface *ptr )
 void PluginInterface2::SetTCPInterface( TCPInterface *ptr )
 {
 	tcpInterface=ptr;
+}
+#endif
+#if _RAKNET_SUPPORT_RDMAInterface==1
+void PluginInterface2::SetRDMAInterface( RDMAInterface *ptr )
+{
+	rdmaInterface=ptr;
 }
 #endif
 RakNetGUID PluginInterface2::GetMyGUIDUnified(void) const
