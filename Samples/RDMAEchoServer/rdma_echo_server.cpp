@@ -33,7 +33,7 @@ using namespace RakNet;
 #define MAX_CLIENTS 10
 #define SERVER_PORT 60000
 
-int main(void)
+int main(int argc, char *argv[])
 {
 #if _RAKNET_SUPPORT_PacketizedRDMA==1
     printf("RakNet RDMA Echo Server Example\n");
@@ -77,6 +77,9 @@ int main(void)
     printf("Waiting for connections...\n");
     printf("Press Ctrl+C to exit\n\n");
 
+    // Give worker thread time to fully initialize
+    RakSleep(100);
+
     // Main server loop
     Packet *packet;
     unsigned char packetIdentifier;
@@ -85,6 +88,7 @@ int main(void)
     {
         // Check for new connections
         SystemAddress newConnection = rdmaInterface->HasNewIncomingConnection();
+        
         if (newConnection != UNASSIGNED_SYSTEM_ADDRESS)
         {
             printf("[+] New RDMA connection from %s\n", newConnection.ToString());
@@ -92,6 +96,7 @@ int main(void)
 
         // Check for lost connections
         SystemAddress lostConnection = rdmaInterface->HasLostConnection();
+        
         if (lostConnection != UNASSIGNED_SYSTEM_ADDRESS)
         {
             printf("[-] Lost RDMA connection from %s\n", lostConnection.ToString());
@@ -128,7 +133,7 @@ int main(void)
             }
         }
 
-        // Sleep to avoid busy-waiting (RDMA is event-driven in production)
+        // Sleep to avoid busy-waiting
         RakSleep(30);
     }
 

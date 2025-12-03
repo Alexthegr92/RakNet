@@ -55,7 +55,14 @@ IF(WIN32 AND NOT UNIX)
 	ENDIF()
 	
 	# Copy libfabric DLL to output directory after build
-	SET(_LF_DLL "${_LF_ROOT}/bin/libfabric_new.dll")
+	# Use Release build from C:\repos\Libfabric-win if available, otherwise fallback to SDK
+	IF(EXISTS "C:/repos/Libfabric-win/x64/Release/libfabric_new.dll")
+		SET(_LF_DLL "C:/repos/Libfabric-win/x64/Release/libfabric_new.dll")
+		MESSAGE(STATUS "Using Release libfabric_new.dll from build directory")
+	ELSE()
+		SET(_LF_DLL "${_LF_ROOT}/bin/libfabric_new.dll")
+	ENDIF()
+	
 	IF(EXISTS "${_LF_DLL}")
 		add_custom_command(TARGET rdma_echo_server POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different

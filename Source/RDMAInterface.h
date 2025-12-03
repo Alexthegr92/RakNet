@@ -179,6 +179,11 @@ protected:
 	bool InitializeFabric(const char* providerName);
 	void CleanupFabric();
 	
+	// Control socket helpers for address exchange (EFA_Test pattern)
+	int ControlSocketServerInit(unsigned short port);
+	int ControlSocketClientConnect(const char* host, unsigned short port);
+	fi_addr_t ControlSocketExchangeAddresses(int sockfd, bool isServer);
+	
 	// Plugins
 	DataStructures::List<PluginInterface2*> messageHandlerList;
 	
@@ -194,6 +199,13 @@ protected:
 	struct fid_pep* listener;          // Passive endpoint for listening
 	struct fid_eq* event_queue;        // Event queue
 	struct fid_cq* completion_queue;   // Completion queue
+	struct fid_av* address_vector;     // Address vector for RDM mode
+	struct fid_ep* main_endpoint;      // Main endpoint for RDM mode
+	
+	// TCP control socket for address exchange (EFA_Test pattern)
+	int control_sockfd;
+	char local_ep_name[64];
+	size_t local_ep_namelen;
 	
 	// Connection management
 	RDMARemoteClient* remoteClients;
@@ -235,6 +247,7 @@ struct RDMARemoteClient
 		isActive = false;
 		sendBuffer = nullptr;
 		recvBuffer = nullptr;
+		fi_addr = FI_ADDR_UNSPEC;
 	}
 	
 	struct fid_ep* endpoint;           // RDMA endpoint
@@ -243,6 +256,7 @@ struct RDMARemoteClient
 	bool isActive;
 	SimpleMutex outgoingDataMutex;
 	SimpleMutex isActiveMutex;
+	fi_addr_t fi_addr;                 // Fabric address for RDM mode
 	
 	// Pre-registered RDMA buffers
 	RDMABufferPool::RDMABuffer* sendBuffer;

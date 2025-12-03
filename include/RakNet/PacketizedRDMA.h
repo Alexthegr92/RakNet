@@ -1,18 +1,3 @@
-/*
- *  Copyright (c) 2014, Oculus VR, Inc.
- *  All rights reserved.
- *
- *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
- *  of patent rights can be found in the PATENTS file in the same directory.
- *
- */
-
-/// \file
-/// \brief Wrapper around RDMAInterface to provide packet framing
-/// Similar to PacketizedTCP, adds length prefixes to messages for proper packet boundaries
-///
-
 #include "NativeFeatureIncludes.h"
 #if _RAKNET_SUPPORT_PacketizedRDMA==1 && _RAKNET_SUPPORT_RDMAInterface==1
 

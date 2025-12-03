@@ -36,9 +36,12 @@ int main(int argc, char *argv[])
 {
 #if _RAKNET_SUPPORT_PacketizedRDMA==1
     const char *serverAddress = "127.0.0.1";
+    int serverPort = SERVER_PORT;
     
     if (argc > 1)
         serverAddress = argv[1];
+    if (argc > 2)
+        serverPort = atoi(argv[2]);
 
     printf("RakNet RDMA Echo Client Example\n");
     printf("================================\n\n");
@@ -71,9 +74,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("Connecting to %s:%d...\n", serverAddress, SERVER_PORT);
+    printf("Client interface started, now connecting...\n");
+    fflush(stdout);
+
+    printf("Connecting to %s:%d...\n", serverAddress, serverPort);
+    fflush(stdout);
     
-    SystemAddress serverAddr = rdmaInterface->Connect(serverAddress, SERVER_PORT, true);
+    SystemAddress serverAddr = rdmaInterface->Connect(serverAddress, serverPort, true);
+    
+    printf("Connect() returned, checking result...\n");
+    fflush(stdout);
     
     if (serverAddr == UNASSIGNED_SYSTEM_ADDRESS)
     {
@@ -85,29 +95,54 @@ int main(int argc, char *argv[])
 
     // Wait for connection to complete
     printf("Waiting for connection to complete...\n");
+    fflush(stdout);
     bool connected = false;
     TimeMS startTime = GetTimeMS();
     
+    printf("Starting wait loop (timeout=5000ms)...\n");
+    fflush(stdout);
+    
     while (GetTimeMS() - startTime < 5000) // 5 second timeout
     {
+        printf("Checking for completed connection...\n");
+        fflush(stdout);
         SystemAddress completedConn = rdmaInterface->HasCompletedConnectionAttempt();
+        printf("HasCompletedConnectionAttempt returned %s\n", completedConn.ToString());
+        fflush(stdout);
         if (completedConn != UNASSIGNED_SYSTEM_ADDRESS)
         {
+            printf("Connection detected! Setting connected=true\n");
+            fflush(stdout);
             printf("Successfully connected to %s!\n\n", completedConn.ToString());
+            fflush(stdout);
             connected = true;
+            printf("Breaking from loop...\n");
+            fflush(stdout);
             break;
         }
         
+        printf("Checking for failed connection...\n");
+        fflush(stdout);
         SystemAddress failedConn = rdmaInterface->HasFailedConnectionAttempt();
+        printf("HasFailedConnectionAttempt returned %s\n", failedConn.ToString());
+        fflush(stdout);
         if (failedConn != UNASSIGNED_SYSTEM_ADDRESS)
         {
             printf("Connection attempt failed!\n");
             break;
         }
         
+        printf("Sleeping 100ms...\n");
+        fflush(stdout);
         RakSleep(100);
     }
+    
+    printf("Exited wait loop, connected=%d\n", connected);
+    fflush(stdout);
 
+    printf("About to check connected flag...\n");
+    fflush(stdout);
+    
     if (!connected)
     {
         printf("Connection timeout or failed!\n");
@@ -116,8 +151,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    printf("Connected flag is true, preparing to send...\n");
+    fflush(stdout);
+    
     // Send test messages
     printf("Sending test messages...\n\n");
+    fflush(stdout);
     
     const char* testMessages[] = {
         "Hello RDMA!",
@@ -132,6 +171,8 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numMessages; i++)
     {
         printf("[SEND %d/%d] %s\n", i+1, numMessages, testMessages[i]);
+        fflush(stdout);
+        
         rdmaInterface->Send(testMessages[i], (unsigned int)strlen(testMessages[i]) + 1, 
                            serverAddr, false);
         RakSleep(500); // Small delay between sends
@@ -139,6 +180,7 @@ int main(int argc, char *argv[])
 
     // Receive echoed responses
     printf("\nWaiting for echo responses...\n");
+    fflush(stdout);
     int receivedCount = 0;
     startTime = GetTimeMS();
     
@@ -149,6 +191,7 @@ int main(int argc, char *argv[])
         if (packet)
         {
             printf("[RECV %d/%d] Echo: %s\n", receivedCount+1, numMessages, packet->data);
+            fflush(stdout);
             receivedCount++;
             rdmaInterface->DeallocatePacket(packet);
         }
@@ -162,6 +205,8 @@ int main(int argc, char *argv[])
         printf("\nAll messages echoed successfully!\n");
     else
         printf("\nReceived %d/%d echo responses\n", receivedCount, numMessages);
+    
+    fflush(stdout);
 
     // Cleanup
     printf("\nDisconnecting...\n");
