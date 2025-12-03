@@ -6,6 +6,8 @@
 #include "BitStream.h"
 #include "MessageIdentifiers.h"
 #include "RakAlloca.h"
+#include "GetTime.h"
+#include "RakSleep.h"
 
 using namespace RakNet;
 
@@ -299,4 +301,25 @@ SystemAddress PacketizedRDMA::HasLostConnection(void)
 	return UNASSIGNED_SYSTEM_ADDRESS;
 }
 
+SystemAddress PacketizedRDMA::WaitForConnectionAttempt(unsigned int timeoutMS)
+{
+	TimeMS startTime = GetTimeMS();
+	
+	while (GetTimeMS() - startTime < timeoutMS)
+	{
+		SystemAddress completedConn = HasCompletedConnectionAttempt();
+		if (completedConn != UNASSIGNED_SYSTEM_ADDRESS)
+			return completedConn;
+		
+		SystemAddress failedConn = HasFailedConnectionAttempt();
+		if (failedConn != UNASSIGNED_SYSTEM_ADDRESS)
+			return UNASSIGNED_SYSTEM_ADDRESS;
+		
+		RakSleep(100);
+	}
+	
+	return UNASSIGNED_SYSTEM_ADDRESS; // Timeout
+}
+
 #endif // _RAKNET_SUPPORT_PacketizedRDMA==1 && _RAKNET_SUPPORT_RDMAInterface==1
+

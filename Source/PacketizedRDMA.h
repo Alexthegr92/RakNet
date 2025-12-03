@@ -51,6 +51,11 @@ public:
 	/// Queued events of lost connections
 	SystemAddress HasLostConnection(void);
 
+	/// Blocking call that waits for a connection attempt to complete
+	/// \param[in] timeoutMS Maximum time to wait in milliseconds
+	/// \return The SystemAddress of the connected peer, or UNASSIGNED_SYSTEM_ADDRESS on timeout/failure
+	SystemAddress WaitForConnectionAttempt(unsigned int timeoutMS = 5000);
+
 protected:
 	void PushNotificationsToQueues(void);
 	Packet* ReturnOutgoingPacket(void);
